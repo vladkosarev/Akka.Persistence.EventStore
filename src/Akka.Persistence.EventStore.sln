@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Persistence.EventStore", "Akka.Persistence.EventStore\Akka.Persistence.EventStore.csproj", "{EE5EFB3F-FEB6-4342-9C85-0428CA7B7197}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Persistence.EventStore.Tests", "Akka.Persistence.EventStore.Tests\Akka.Persistence.EventStore.Tests.csproj", "{CD2664C2-A07B-4B3A-A493-24827F4611DC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{9F7249F3-7706-4C97-8FF3-947FF8341999}"
+	ProjectSection(SolutionItems) = preProject
+		..\build.cmd = ..\build.cmd
+		..\build.fsx = ..\build.fsx
+		..\build.sh = ..\build.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FF710BEA-73A2-4D37-AFB0-7BC6D4C07E88}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.Dev.Config = .nuget\NuGet.Dev.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EE5EFB3F-FEB6-4342-9C85-0428CA7B7197}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE5EFB3F-FEB6-4342-9C85-0428CA7B7197}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE5EFB3F-FEB6-4342-9C85-0428CA7B7197}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE5EFB3F-FEB6-4342-9C85-0428CA7B7197}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD2664C2-A07B-4B3A-A493-24827F4611DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD2664C2-A07B-4B3A-A493-24827F4611DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD2664C2-A07B-4B3A-A493-24827F4611DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD2664C2-A07B-4B3A-A493-24827F4611DC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
