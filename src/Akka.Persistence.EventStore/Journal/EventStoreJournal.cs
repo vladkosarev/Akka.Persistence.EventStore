@@ -44,7 +44,7 @@ namespace Akka.Persistence.EventStore.Journal
             {
                 try
                 {
-                    IEventStoreConnection connection = EventStoreConnection.Create(_extension.EventStoreJournalSettings.ConnectionString, _extension.EventStoreJournalSettings.ConnectionName);
+                    IEventStoreConnection connection = EventStoreConnection.Create(_extension.EventStoreJournalSettings.ConnectionString, _extension.EventStoreJournalSettings.ConnectionName);                    
                     await connection.ConnectAsync();
                     return connection;
                 }
