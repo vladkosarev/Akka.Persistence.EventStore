@@ -151,7 +151,7 @@ namespace Akka.Persistence.EventStore.Journal
                             var metaJson = JsonConvert.SerializeObject(payload.GetType().GetProperty("Metadata").GetValue(x.Payload), propType, _serializerSettings);
                             meta = Encoding.UTF8.GetBytes(metaJson);
                         }
-                        return new EventData(eventId, x.GetType().FullName, true, data, meta);
+                        return new EventData(eventId, x.Payload.GetType().FullName, true, data, meta);
                     });
 
                     var connection = await GetConnection();
