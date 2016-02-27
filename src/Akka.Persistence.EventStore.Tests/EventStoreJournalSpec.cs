@@ -17,7 +17,10 @@ namespace Akka.Persistence.EventStore.Tests
                 eventstore {
                     class = ""Akka.Persistence.EventStore.Journal.EventStoreJournal, Akka.Persistence.EventStore""
                     plugin-dispatcher = ""akka.actor.default-dispatcher""
-                    connection-string = ""ConnectTo=tcp://admin:changeit@127.0.0.1:4567;""                    
+                    host=""127.0.0.1""
+                    tcp-port = ""4567""
+                    deserializer = ""Akka.Persistence.EventStore.DefaultDeserializer, Akka.Persistence.EventStore""
+                    connection-factory = ""Akka.Persistence.EventStore.DefaultConnectionFactory, Akka.Persistence.EventStore""
                 }
             }
         }");

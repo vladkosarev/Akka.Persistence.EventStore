@@ -1,27 +1,73 @@
 ﻿using Akka.Actor;
 using Akka.Configuration;
+using Akka.Event;
+using Akka.Persistence.EventStore.Journal;
+using EventStore.ClientAPI;
+using System;
+using System.Threading.Tasks;
 
 namespace Akka.Persistence.EventStore
 {
-    public class EventStoreJournalSettings : JournalSettings
+    public class JournalSettings
     {
         public const string ConfigPath = "akka.persistence.journal.eventstore";
 
-        public EventStoreJournalSettings(Config config)
-            : base(config)
+        public IDeserializer Deserializer { get; private set; }
+        private readonly Task<IEventStoreConnection> _init;
+
+        public JournalSettings(ILoggingAdapter log, Config config)
         {
+            if (config == null) throw new ArgumentNullException("config", "EventStore journal settings cannot be initialized, because required HOCON section couldn't been found");
+
+            var deserializerType = Type.GetType(config.GetString("deserializer"));
+            Deserializer = deserializerType != null
+                ? (IDeserializer)Activator.CreateInstance(deserializerType)
+                : new DefaultDeserializer();
+
+            var host = config.GetString("host");
+            var tcpPort = config.GetInt("tcp-port");
+
+            var settingsFactoryType = Type.GetType(config.GetString("connection-factory"));
+            var factory = settingsFactoryType != null
+                ? (IConnectionFactory)Activator.CreateInstance(settingsFactoryType)
+                : new DefaultConnectionFactory();
+
+            _init = factory.CreateAsync(log, host, tcpPort);
         }
+
+        public IEventStoreConnection Connection { get { return _init.Result; } }
     }
 
-    public class EventStoreSnapshotSettings : SnapshotStoreSettings
+    public class SnapshotStoreSettings
     {
         public const string ConfigPath = "akka.persistence.snapshot-store.eventstore";
 
-        public EventStoreSnapshotSettings(Config config)
-            : base(config)
+        public IDeserializer Deserializer { get; private set; }
+        private readonly Task<IEventStoreConnection> _init;
+
+        public SnapshotStoreSettings(ILoggingAdapter log, Config config)
         {
+            if (config == null) throw new ArgumentNullException("config", "EventStore snapshot settings cannot be initialized, because required HOCON section couldn't been found");
+
+            var deserializerType = Type.GetType(config.GetString("deserializer"));
+            Deserializer = deserializerType != null
+                ? (IDeserializer)Activator.CreateInstance(deserializerType)
+                : new DefaultDeserializer();
+
+            var host = config.GetString("host");
+            var tcpPort = config.GetInt("tcp-port");
+
+            var settingsFactoryType = Type.GetType(config.GetString("connection-factory"));
+            var factory = settingsFactoryType != null
+                ? (IConnectionFactory)Activator.CreateInstance(settingsFactoryType)
+                : new DefaultConnectionFactory();
+
+            _init = factory.CreateAsync(log, host, tcpPort);
         }
+
+        public IEventStoreConnection Connection { get { return _init.Result; } }
     }
+
 
     /// <summary>
     /// An actor system extension initializing support for EventStore persistence layer.
@@ -31,32 +77,31 @@ namespace Akka.Persistence.EventStore
         /// <summary>
         /// Journal-related settings loaded from HOCON configuration.
         /// </summary>
-        public readonly EventStoreJournalSettings EventStoreJournalSettings;
+        public readonly JournalSettings JournalSettings;
 
         /// <summary>
         /// Snapshot store related settings loaded from HOCON configuration.
         /// </summary>
-        public readonly EventStoreSnapshotSettings EventStoreSnapshotSettings;
-
+        public readonly SnapshotStoreSettings SnapshotStoreSettings;
 
         public EventStorePersistenceExtension(ExtendedActorSystem system)
         {
             system.Settings.InjectTopLevelFallback(EventStorePersistence.DefaultConfiguration());
 
-            EventStoreJournalSettings = new EventStoreJournalSettings(system.Settings.Config.GetConfig(EventStoreJournalSettings.ConfigPath));
-            EventStoreSnapshotSettings = new EventStoreSnapshotSettings(system.Settings.Config.GetConfig(EventStoreSnapshotSettings.ConfigPath));
+            JournalSettings = new JournalSettings(system.Log, system.Settings.Config.GetConfig(JournalSettings.ConfigPath));
+            SnapshotStoreSettings = new SnapshotStoreSettings(system.Log, system.Settings.Config.GetConfig(SnapshotStoreSettings.ConfigPath));
         }
     }
 
     /// <summary>
-    /// Singleton class used to setup Azure Storage backend for akka persistence plugin.
+    /// Singleton class used to setup EventStore backend for akka persistence plugin.
     /// </summary>
     public class EventStorePersistence : ExtensionIdProvider<EventStorePersistenceExtension>
     {
         public static readonly EventStorePersistence Instance = new EventStorePersistence();
 
         /// <summary>
-        /// Initializes a Table Storage persistence plugin inside provided <paramref name="actorSystem"/>.
+        /// Initializes a EventStore persistence plugin inside provided <paramref name="actorSystem"/>.
         /// </summary>
         public static void Init(ActorSystem actorSystem)
         {
@@ -66,7 +111,7 @@ namespace Akka.Persistence.EventStore
         private EventStorePersistence() { }
 
         /// <summary>
-        /// Creates an actor system extension for akka persistence Azure Storage support.
+        /// Creates an actor system extension for akka persistence EventStore support.
         /// </summary>
         /// <param name="system"></param>
         /// <returns></returns>
@@ -76,7 +121,7 @@ namespace Akka.Persistence.EventStore
         }
 
         /// <summary>
-        /// Returns a default configuration for akka persistence EventStore journals and snapshot stores.
+        /// Returns a default configuration for akka persistence EventStore-based journals and snapshot stores.
         /// </summary>
         /// <returns></returns>
         public static Config DefaultConfiguration()
@@ -84,4 +129,5 @@ namespace Akka.Persistence.EventStore
             return ConfigurationFactory.FromResource<EventStorePersistence>("Akka.Persistence.EventStore.eventstore.conf");
         }
     }
+
 }
